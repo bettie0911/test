@@ -3,24 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>こんにちは</title>
+  <title>世界のあいさつ</title>
   <style>
     body {
       margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 40px 16px;
       font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
       background: #f5f5f5;
       color: #333;
     }
     h1 {
-      font-size: 3rem;
+      text-align: center;
+      font-size: 2.5rem;
+      margin: 0 0 32px;
+    }
+    ul {
+      list-style: none;
+      margin: 0 auto;
+      padding: 0;
+      max-width: 960px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    li {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .greeting {
+      display: block;
+      font-size: 1.75rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .language {
+      font-size: 0.9rem;
+      color: #777;
     }
   </style>
 </head>
 <body>
-  <h1>こんにちは</h1>
+  <h1>世界のあいさつ</h1>
+  <ul>
+    <li><span class="greeting" lang="ja">こんにちは</span><span class="language">日本語</span></li>
+    <li><span class="greeting" lang="en">Hello</span><span class="language">英語</span></li>
+    <li><span class="greeting" lang="zh">你好</span><span class="language">中国語</span></li>
+    <li><span class="greeting" lang="ko">안녕하세요</span><span class="language">韓国語</span></li>
+    <li><span class="greeting" lang="es">Hola</span><span class="language">スペイン語</span></li>
+    <li><span class="greeting" lang="fr">Bonjour</span><span class="language">フランス語</span></li>
+    <li><span class="greeting" lang="de">Hallo</span><span class="language">ドイツ語</span></li>
+    <li><span class="greeting" lang="it">Ciao</span><span class="language">イタリア語</span></li>
+    <li><span class="greeting" lang="pt">Olá</span><span class="language">ポルトガル語</span></li>
+    <li><span class="greeting" lang="ru">Здравствуйте</span><span class="language">ロシア語</span></li>
+    <li><span class="greeting" lang="ar" dir="rtl">مرحبا</span><span class="language">アラビア語</span></li>
+    <li><span class="greeting" lang="hi">नमस्ते</span><span class="language">ヒンディー語</span></li>
+    <li><span class="greeting" lang="th">สวัสดี</span><span class="language">タイ語</span></li>
+    <li><span class="greeting" lang="vi">Xin chào</span><span class="language">ベトナム語</span></li>
+    <li><span class="greeting" lang="id">Halo</span><span class="language">インドネシア語</span></li>
+    <li><span class="greeting" lang="tr">Merhaba</span><span class="language">トルコ語</span></li>
+    <li><span class="greeting" lang="el">Γειά σου</span><span class="language">ギリシャ語</span></li>
+    <li><span class="greeting" lang="he" dir="rtl">שלום</span><span class="language">ヘブライ語</span></li>
+    <li><span class="greeting" lang="sw">Jambo</span><span class="language">スワヒリ語</span></li>
+    <li><span class="greeting" lang="haw">Aloha</span><span class="language">ハワイ語</span></li>
+  </ul>
 </body>
 </html>
