@@ -15,6 +15,11 @@
     h1 {
       text-align: center;
       font-size: 2.5rem;
+      margin: 0 0 8px;
+    }
+    .lead {
+      text-align: center;
+      color: #777;
       margin: 0 0 32px;
     }
     ul {
@@ -26,12 +31,23 @@
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 16px;
     }
-    li {
+    .card {
+      width: 100%;
       background: #fff;
+      border: none;
       border-radius: 12px;
       padding: 20px;
       text-align: center;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
     .greeting {
       display: block;
@@ -39,35 +55,239 @@
       font-weight: bold;
       margin-bottom: 8px;
     }
+    rt {
+      font-size: 0.45em;
+      font-weight: normal;
+      color: #e0607e;
+    }
     .language {
       font-size: 0.9rem;
       color: #777;
+    }
+
+    dialog {
+      width: min(480px, calc(100% - 32px));
+      border: none;
+      border-radius: 16px;
+      padding: 0;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+      color: #333;
+    }
+    .dialog-body {
+      padding: 28px;
+    }
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.4);
+    }
+    .dialog-greeting {
+      display: block;
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 0;
+      text-align: center;
+    }
+    .dialog-language {
+      text-align: center;
+      color: #777;
+      margin: 4px 0 20px;
+    }
+    dialog h3 {
+      font-size: 1rem;
+      margin: 16px 0 4px;
+      color: #e0607e;
+    }
+    dialog p {
+      margin: 0;
+      line-height: 1.7;
+    }
+    .close {
+      display: block;
+      margin: 24px auto 0;
+      padding: 10px 32px;
+      border: none;
+      border-radius: 999px;
+      background: #333;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <h1>世界のあいさつ</h1>
-  <ul>
-    <li><span class="greeting" lang="ja">こんにちは</span><span class="language">日本語</span></li>
-    <li><span class="greeting" lang="en">Hello</span><span class="language">英語</span></li>
-    <li><span class="greeting" lang="zh">你好</span><span class="language">中国語</span></li>
-    <li><span class="greeting" lang="ko">안녕하세요</span><span class="language">韓国語</span></li>
-    <li><span class="greeting" lang="es">Hola</span><span class="language">スペイン語</span></li>
-    <li><span class="greeting" lang="fr">Bonjour</span><span class="language">フランス語</span></li>
-    <li><span class="greeting" lang="de">Hallo</span><span class="language">ドイツ語</span></li>
-    <li><span class="greeting" lang="it">Ciao</span><span class="language">イタリア語</span></li>
-    <li><span class="greeting" lang="pt">Olá</span><span class="language">ポルトガル語</span></li>
-    <li><span class="greeting" lang="ru">Здравствуйте</span><span class="language">ロシア語</span></li>
-    <li><span class="greeting" lang="ar" dir="rtl">مرحبا</span><span class="language">アラビア語</span></li>
-    <li><span class="greeting" lang="hi">नमस्ते</span><span class="language">ヒンディー語</span></li>
-    <li><span class="greeting" lang="th">สวัสดี</span><span class="language">タイ語</span></li>
-    <li><span class="greeting" lang="vi">Xin chào</span><span class="language">ベトナム語</span></li>
-    <li><span class="greeting" lang="id">Halo</span><span class="language">インドネシア語</span></li>
-    <li><span class="greeting" lang="tr">Merhaba</span><span class="language">トルコ語</span></li>
-    <li><span class="greeting" lang="el">Γειά σου</span><span class="language">ギリシャ語</span></li>
-    <li><span class="greeting" lang="he" dir="rtl">שלום</span><span class="language">ヘブライ語</span></li>
-    <li><span class="greeting" lang="sw">Jambo</span><span class="language">スワヒリ語</span></li>
-    <li><span class="greeting" lang="haw">Aloha</span><span class="language">ハワイ語</span></li>
-  </ul>
+  <p class="lead">あいさつを押すと、意味や由来、その国の説明が見られます</p>
+  <ul id="list"></ul>
+
+  <dialog id="dialog">
+    <div class="dialog-body">
+    <p class="dialog-greeting" id="dialog-greeting"></p>
+    <p class="dialog-language" id="dialog-language"></p>
+    <h3>意味・由来</h3>
+    <p id="dialog-meaning"></p>
+    <h3 id="dialog-country-title"></h3>
+    <p id="dialog-country"></p>
+    <button class="close" id="close" type="button">閉じる</button>
+    </div>
+  </dialog>
+
+  <script>
+    const greetings = [
+      {
+        text: "こんにちは", reading: "", lang: "ja", language: "日本語", country: "日本",
+        meaning: "「今日（こんにち）はご機嫌いかがですか」などのあいさつの、後半が省略されてできた言葉です。もとは「今日は」という文の一部なので、最後の文字は「わ」ではなく「は」と書きます。",
+        about: "東アジアにある島国で、首都は東京です。人口は約1億2千万人。北海道・本州・四国・九州などの島々からなり、四季の変化がはっきりしています。"
+      },
+      {
+        text: "Hello", reading: "ハロー", lang: "en", language: "英語", country: "イギリス（英語の発祥地）",
+        meaning: "人を呼ぶときの「hallo」「hollo」などの古い掛け声から生まれた言葉です。19世紀に電話が広まった際、電話に出るときの第一声として使われ、あいさつとして一般に定着しました。",
+        about: "ヨーロッパの北西にある島国で、首都はロンドンです。英語はイギリスから広まり、今ではアメリカやオーストラリアなど多くの国で話され、世界の共通語として使われています。"
+      },
+      {
+        text: "你好", reading: "ニーハオ", lang: "zh", language: "中国語", country: "中国",
+        meaning: "「你（ニー）」は「あなた」、「好（ハオ）」は「よい」という意味です。合わせて「あなたが元気でありますように」という気持ちを表します。",
+        about: "東アジアにある大きな国で、首都は北京です。人口は約14億人。数千年の歴史を持ち、漢字や箸など、日本にも多くの文化が伝わりました。"
+      },
+      {
+        text: "안녕하세요", reading: "アンニョンハセヨ", lang: "ko", language: "韓国語", country: "韓国",
+        meaning: "「안녕（アンニョン）」は漢字で書くと「安寧」で、「安らかで穏やか」という意味です。「安らかにお過ごしですか」とたずねる、ていねいなあいさつです。",
+        about: "朝鮮半島の南側にある国で、首都はソウルです。人口は約5千万人。文字はハングルを使い、音楽やドラマ、料理などが世界中で人気です。"
+      },
+      {
+        text: "Hola", reading: "オラ", lang: "es", language: "スペイン語", country: "スペイン",
+        meaning: "古くから人に呼びかけるときに使われてきた言葉で、起源には諸説あります。朝・昼・夜のいつでも使える、気軽なあいさつです。",
+        about: "ヨーロッパの南西、イベリア半島にある国で、首都はマドリードです。スペイン語はメキシコやアルゼンチンなど中南米を中心に、20以上の国で公用語になっています。"
+      },
+      {
+        text: "Bonjour", reading: "ボンジュール", lang: "fr", language: "フランス語", country: "フランス",
+        meaning: "「bon（ボン）」は「よい」、「jour（ジュール）」は「日」という意味です。合わせて「よい一日を」という気持ちを込めたあいさつです。",
+        about: "西ヨーロッパにある国で、首都はパリです。芸術や料理、ファッションで知られ、世界で最も多くの観光客が訪れる国のひとつです。"
+      },
+      {
+        text: "Hallo", reading: "ハロー", lang: "de", language: "ドイツ語", country: "ドイツ",
+        meaning: "人に呼びかけるときの掛け声から生まれた言葉で、英語の「Hello」と同じルーツを持ちます。あらたまった場面では「Guten Tag（グーテン ターク：よい日を）」も使われます。",
+        about: "ヨーロッパの中央にある国で、首都はベルリンです。人口は約8千万人。自動車などのものづくりが盛んで、ビールやソーセージでも有名です。"
+      },
+      {
+        text: "Ciao", reading: "チャオ", lang: "it", language: "イタリア語", country: "イタリア",
+        meaning: "ヴェネツィアの方言で「あなたの召し使いです」という意味の言葉が短くなったものです。もとは「何でもお申し付けください」という意味でした。会ったときにも別れるときにも使います。",
+        about: "ヨーロッパの南にある、長靴の形をした半島の国で、首都はローマです。古代ローマやルネサンスの文化遺産が多く、ピザやパスタの本場です。"
+      },
+      {
+        text: "Olá", reading: "オラ", lang: "pt", language: "ポルトガル語", country: "ポルトガル",
+        meaning: "スペイン語の「Hola」と同じ仲間の言葉で、人に呼びかけるときの言葉から生まれました。親しい人にも初対面の人にも使えるあいさつです。",
+        about: "ヨーロッパの西の端にある国で、首都はリスボンです。大航海時代には日本にも来航し、「パン」や「カステラ」などの言葉を伝えました。ポルトガル語を話す人の多くはブラジルに住んでいます。"
+      },
+      {
+        text: "Здравствуйте", reading: "ズドラーストヴィチェ", lang: "ru", language: "ロシア語", country: "ロシア",
+        meaning: "「健康である」という意味の言葉から来ていて、「健康でいてください」という願いが込められています。親しい人には短く「Привет（プリヴェート）」と言います。",
+        about: "ヨーロッパからアジアにまたがる、世界で一番面積の大きい国で、首都はモスクワです。国内に11の時間帯があるほど東西に広がっています。"
+      },
+      {
+        text: "مرحبا", reading: "マルハバ", lang: "ar", dir: "rtl", language: "アラビア語", country: "アラビア語圏",
+        meaning: "「広々とした場所」を意味する言葉に由来し、「ようこそ、どうぞくつろいで」という歓迎の気持ちを表します。アラビア文字は右から左へ書きます。",
+        about: "アラビア語は、サウジアラビアやエジプトなど中東から北アフリカにかけての20以上の国で公用語になっています。砂漠の多い地域で、古くから交易で栄えてきました。"
+      },
+      {
+        text: "नमस्ते", reading: "ナマステ", lang: "hi", language: "ヒンディー語", country: "インド",
+        meaning: "「namaḥ（ナマハ）」は「敬意を表す・おじぎする」、「te（テー）」は「あなたに」という意味です。合わせて「あなたに敬意を表します」となり、胸の前で手を合わせて言います。",
+        about: "南アジアにある国で、首都はニューデリーです。人口は世界一の約14億人。多くの言語や宗教が共存し、カレーやヨガの発祥地として知られています。"
+      },
+      {
+        text: "สวัสดี", reading: "サワッディー", lang: "th", language: "タイ語", country: "タイ",
+        meaning: "古代インドの言葉サンスクリット語の「svasti（幸福・繁栄）」に由来し、1930〜40年代にあいさつとして広められました。男性は最後に「クラップ」、女性は「カー」を付け、手を合わせて言います。",
+        about: "東南アジアにある国で、首都はバンコクです。仏教が深く根付いていて、多くの寺院があります。「ほほえみの国」とも呼ばれます。"
+      },
+      {
+        text: "Xin chào", reading: "シン チャオ", lang: "vi", language: "ベトナム語", country: "ベトナム",
+        meaning: "「xin（シン）」は「どうか〜させてください」、「chào（チャオ）」は「あいさつする」という意味です。合わせて「ごあいさつさせてください」というていねいな言い方になります。",
+        about: "東南アジアにある南北に細長い国で、首都はハノイです。フォーや春巻きなどの料理が有名で、アルファベットに記号を付けた文字で言葉を書きます。"
+      },
+      {
+        text: "Halo", reading: "ハロ", lang: "id", language: "インドネシア語", country: "インドネシア",
+        meaning: "かつてインドネシアを支配したオランダの言葉「hallo」から入った言葉です。あらたまった場面では「Selamat pagi（スラマット パギ：おはようございます）」なども使います。",
+        about: "東南アジアにある国で、首都はジャカルタです。1万を超える島々からなり、人口は約2億8千万人。バリ島などのリゾート地でも知られています。"
+      },
+      {
+        text: "Merhaba", reading: "メルハバ", lang: "tr", language: "トルコ語", country: "トルコ",
+        meaning: "アラビア語の「マルハバ（ようこそ）」がトルコ語に取り入れられた言葉です。時間帯を問わず使える、気軽なあいさつです。",
+        about: "アジアとヨーロッパにまたがる国で、首都はアンカラです。最大の都市イスタンブールは、東西の文化が交わる場所として長い歴史があります。"
+      },
+      {
+        text: "Γειά σου", reading: "ヤー スー", lang: "el", language: "ギリシャ語", country: "ギリシャ",
+        meaning: "「γειά（ヤー）」は「健康」、「σου（スー）」は「あなたの」という意味で、「あなたに健康を」という願いを込めたあいさつです。会ったときにも別れるときにも使います。",
+        about: "ヨーロッパの南東、地中海に面した国で、首都はアテネです。古代ギリシャ文明の地で、オリンピック発祥の国でもあります。"
+      },
+      {
+        text: "שלום", reading: "シャローム", lang: "he", dir: "rtl", language: "ヘブライ語", country: "イスラエル",
+        meaning: "「平和」「安らぎ」という意味の言葉です。会ったときにも別れるときにも使い、相手の平和を願う気持ちが込められています。ヘブライ文字は右から左へ書きます。",
+        about: "地中海の東岸にある国です。ヘブライ語は古代に日常では話されなくなっていましたが、19世紀末から復活が進められ、現在は日常の言葉として話されています。"
+      },
+      {
+        text: "Jambo", reading: "ジャンボ", lang: "sw", language: "スワヒリ語", country: "ケニア・タンザニア",
+        meaning: "「元気ですか？」という意味の「Hujambo（フジャンボ）」を短くした言葉です。親しみやすい響きから、観光客へのあいさつとしてよく使われます。",
+        about: "スワヒリ語は、ケニアやタンザニアなどアフリカ東部で広く話されている言葉です。サバンナの野生動物や、アフリカ最高峰のキリマンジャロ山で知られる地域です。"
+      },
+      {
+        text: "Aloha", reading: "アロハ", lang: "haw", language: "ハワイ語", country: "ハワイ（アメリカ）",
+        meaning: "「愛」「思いやり」「慈しみ」などの意味を持つ言葉で、あいさつのほか、感謝や別れのときにも使われます。「alo（前に・共に）」と「hā（息）」が組み合わさったという説があります。",
+        about: "太平洋の真ん中に浮かぶ島々で、アメリカの50番目の州です。州都はホノルル。火山がつくった島々で、フラダンスやサーフィンの文化で知られています。"
+      }
+    ];
+
+    const list = document.getElementById("list");
+    const dialog = document.getElementById("dialog");
+
+    // あいさつの文字に振り仮名を付けた要素を作る
+    function createGreeting(g, className) {
+      const el = document.createElement("span");
+      el.className = className;
+      el.lang = g.lang;
+      if (g.dir) el.dir = g.dir;
+      if (g.reading) {
+        const ruby = document.createElement("ruby");
+        const rt = document.createElement("rt");
+        rt.lang = "ja";
+        rt.textContent = g.reading;
+        ruby.append(g.text, rt);
+        el.append(ruby);
+      } else {
+        el.textContent = g.text;
+      }
+      return el;
+    }
+
+    function openDialog(g) {
+      document.getElementById("dialog-greeting").replaceWith(
+        Object.assign(createGreeting(g, "dialog-greeting"), { id: "dialog-greeting" })
+      );
+      document.getElementById("dialog-language").textContent = g.language;
+      document.getElementById("dialog-meaning").textContent = g.meaning;
+      document.getElementById("dialog-country-title").textContent = g.country + "について";
+      document.getElementById("dialog-country").textContent = g.about;
+      dialog.showModal();
+    }
+
+    greetings.forEach((g) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "card";
+      button.append(createGreeting(g, "greeting"));
+      const language = document.createElement("span");
+      language.className = "language";
+      language.textContent = g.language;
+      button.append(language);
+      button.addEventListener("click", () => openDialog(g));
+
+      const li = document.createElement("li");
+      li.append(button);
+      list.append(li);
+    });
+
+    document.getElementById("close").addEventListener("click", () => dialog.close());
+    // ポップアップの外側をクリックしたら閉じる
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+  </script>
 </body>
 </html>
